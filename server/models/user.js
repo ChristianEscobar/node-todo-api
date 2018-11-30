@@ -51,6 +51,23 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
+UserSchema.statics.findByToken = function(token) {
+  let User = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch(e) {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
+
 // New User model email, password
 // email property - required, trim it, type string, min length 1
 let User = mongoose.model('User', UserSchema);
